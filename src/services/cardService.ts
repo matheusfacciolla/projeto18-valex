@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 
 import formatName from "../utils/formatName.js";
 import * as cardRepository from "../repositories/cardRepository.js";
+import * as paymentRepository from "../repositories/paymentRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
 export async function createCard(
   employee: { id: number; fullName: string },
@@ -15,7 +17,7 @@ export async function createCard(
   const cardExpiration = dayjs(Date.now()).add(5, "year").format("MM/YY");
 
   const numberCVV = faker.finance.creditCardCVV();
-  console.log("security code -> ", numberCVV)
+  console.log("security code -> ", numberCVV);
   const cryptr = new Cryptr("myTotallySecretKey");
   const encryptNumberCVV = cryptr.encrypt(numberCVV);
 
@@ -64,7 +66,7 @@ export async function activateCard(
   }
 
   const encryptedPassword = bcrypt.hashSync(password, 10);
-  
+
   const cardData = {
     employeeId: cardInfo.employeeId,
     number: cardInfo.number,
@@ -78,5 +80,29 @@ export async function activateCard(
     type: cardInfo.type,
   };
 
-  await cardRepository.update(cardInfo.id, cardData)
+  await cardRepository.update(cardInfo.id, cardData);
+}
+
+export async function getBalanceAndStats(cardId: number) {
+  const transactions = await paymentRepository.findByCardId(cardId);
+  const recharges = await rechargeRepository.findByCardId(cardId);
+
+  let sumRecharges = 0;
+  let sumTransactions = 0;
+  recharges.forEach(
+    (recharge) => (sumRecharges += recharge.amount)
+  );
+  transactions.forEach(
+    (transaction) => (sumTransactions += transaction.amount)
+  );
+
+  const balance = sumRecharges - sumTransactions;
+
+  const result = {
+    balance: balance,
+    transactions: [...transactions],
+    recharges: [...recharges],
+  };
+
+  return result;
 }

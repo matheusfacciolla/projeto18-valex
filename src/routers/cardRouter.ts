@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createCard, activateCard } from "../controllers/cardController.js";
+import { createCard, activateCard, getBalanceAndStats } from "../controllers/cardController.js";
 import { employeeMiddleware } from "../middlewares/employeeMiddleware.js";
 import { authenticationApiKey } from "../middlewares/apiKeyMiddleware.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
@@ -22,6 +22,12 @@ cardRouter.put(
   authenticationApiKey,
   validateSchema(activateCardSchema),
   activateCard
+);
+
+cardRouter.get(
+  "/cardbalance",
+  authenticationApiKey,
+  getBalanceAndStats
 );
 
 export default cardRouter;

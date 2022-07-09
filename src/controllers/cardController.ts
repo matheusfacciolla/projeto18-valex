@@ -22,10 +22,13 @@ export async function activateCard(req: Request, res: Response) {
     password: string;
   } = req.body;
 
-  await cardService.activateCard(
-    id,
-    securityCode,
-    password
-  );
+  await cardService.activateCard(id, securityCode, password);
   return res.sendStatus(200);
+}
+
+export async function getBalanceAndStats(req: Request, res: Response) {
+  const { cardId }: { cardId: number } = req.body;
+
+  const balance = await cardService.getBalanceAndStats(cardId);
+  return res.send(balance).status(200);
 }
