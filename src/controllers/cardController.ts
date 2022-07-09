@@ -10,3 +10,22 @@ export async function createCard(req: Request, res: Response) {
   await cardService.createCard(employee, cardType);
   return res.sendStatus(201);
 }
+
+export async function activateCard(req: Request, res: Response) {
+  const {
+    id,
+    securityCode,
+    password,
+  }: {
+    id: number;
+    securityCode: string;
+    password: string;
+  } = req.body;
+
+  await cardService.activateCard(
+    id,
+    securityCode,
+    password
+  );
+  return res.sendStatus(200);
+}

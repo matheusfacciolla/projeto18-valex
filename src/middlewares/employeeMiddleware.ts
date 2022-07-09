@@ -17,6 +17,8 @@ export async function employeeExists(
   }
 
   res.locals.employee = employee;
+
+  next();
 }
 
 export async function uniqueCardType(
@@ -41,6 +43,8 @@ export async function uniqueCardType(
       message: "The employee already has a card of this type",
     };
   }
+
+  next();
 }
 
 export const employeeMiddleware = {

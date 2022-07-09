@@ -8,10 +8,11 @@ export async function authenticationApiKey(
   next: NextFunction
 ) {
   const key = req.headers["x-api-key"].toString();
-
   const company = await companyRepository.findByApiKey(key);
 
   if (!company) {
     throw { type: "Unauthorized", message: "Wrong API Key" };
   }
+
+  next()
 }

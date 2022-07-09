@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const cardSchema = Joi.object({
+export const createCardSchema = Joi.object({
   employeeId: Joi.number().required(),
   cardType: Joi.equal(
     "groceries",
