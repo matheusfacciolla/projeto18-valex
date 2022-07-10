@@ -106,3 +106,79 @@ export async function getBalanceAndStats(cardId: number) {
 
   return result;
 }
+
+export async function cardBlock(cardId: number, password: string) {
+  const cardInfo = await cardRepository.findById(cardId);
+
+  if (!cardInfo) {
+    throw { type: "Not_Found", message: "Card does not exist!" };
+  }
+
+  // if (dayjs().isAfter(cardInfo.expirationDate)) {
+  //   console.log("AQUIIII666666")
+  //   throw { type: "Bad_Request", message: "Card expired!" };
+  // }
+
+  if (cardInfo.isBlocked == true) {
+    throw { type: "Bad_Request", message: "The card is already blocked!" };
+  }
+
+  const isCorrectPassword = bcrypt.compareSync(password, cardInfo.password);
+
+  if (!isCorrectPassword) {
+    throw { type: "Bad_Request", message: "Wrong password!" };
+  }
+
+  const cardData = {
+    employeeId: cardInfo.employeeId,
+    number: cardInfo.number,
+    cardholderName: cardInfo.cardholderName,
+    securityCode: cardInfo.securityCode,
+    expirationDate: cardInfo.expirationDate,
+    password: cardInfo.password,
+    isVirtual: false,
+    originalCardId: null,
+    isBlocked: true,
+    type: cardInfo.type,
+  };
+
+  await cardRepository.update(cardInfo.id, cardData);
+}
+
+export async function cardDesblock(cardId: number, password: string) {
+  const cardInfo = await cardRepository.findById(cardId);
+
+  if (!cardInfo) {
+    throw { type: "Not_Found", message: "Card does not exist!" };
+  }
+
+  // if (dayjs().isAfter(cardInfo.expirationDate)) {
+  //   console.log("AQUIIII666666")
+  //   throw { type: "Bad_Request", message: "Card expired!" };
+  // }
+
+  if (cardInfo.isBlocked == false) {
+    throw { type: "Bad_Request", message: "The card is already blocked!" };
+  }
+
+  const isCorrectPassword = bcrypt.compareSync(password, cardInfo.password);
+
+  if (!isCorrectPassword) {
+    throw { type: "Bad_Request", message: "Wrong password!" };
+  }
+
+  const cardData = {
+    employeeId: cardInfo.employeeId,
+    number: cardInfo.number,
+    cardholderName: cardInfo.cardholderName,
+    securityCode: cardInfo.securityCode,
+    expirationDate: cardInfo.expirationDate,
+    password: cardInfo.password,
+    isVirtual: false,
+    originalCardId: null,
+    isBlocked: false,
+    type: cardInfo.type,
+  };
+
+  await cardRepository.update(cardInfo.id, cardData);
+}
