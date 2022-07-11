@@ -5,19 +5,32 @@ import bcrypt from "bcrypt";
 
 import formatName from "../utils/formatName.js";
 import * as cardRepository from "../repositories/cardRepository.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as paymentRepository from "../repositories/paymentRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
-export async function createCard(
-  employee: { id: number; fullName: string },
-  cardType: cardRepository.TransactionTypes
-) {
+export async function createCard(employeeId: number, cardType: cardRepository.TransactionTypes) {
+
+  const employee = await employeeRepository.findById(employeeId);
+
+  if (!employee) {
+    throw { type: "Not_Found", message: "This employee does not exist" };
+  }
+
+  const card = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
+
+  if (card) {
+    throw {
+      type: "Conflict",
+      message: "The employee already has a card of this type",
+    };
+  }
+
   const cardNumber = faker.finance.creditCardNumber();
   const cardEmployeeName = formatName(employee.fullName);
   const cardExpiration = dayjs(Date.now()).add(5, "year").format("MM/YY");
-
   const numberCVV = faker.finance.creditCardCVV();
-  console.log("security code -> ", numberCVV);
+  console.log("security code", numberCVV)
   const cryptr = new Cryptr("myTotallySecretKey");
   const encryptNumberCVV = cryptr.encrypt(numberCVV);
 
@@ -48,10 +61,9 @@ export async function activateCard(
     throw { type: "Not_Found", message: "Card does not exist!" };
   }
 
-  // if (dayjs().isAfter(cardInfo.expirationDate)) {
-  //   console.log("AQUIIII666666")
-  //   throw { type: "Bad_Request", message: "Card expired!" };
-  // }
+  if (dayjs(cardInfo.expirationDate).isBefore(dayjs(Date.now()).format("MM-YY"))) {
+    throw { type: "Bad_Request", message: "Card expired!" };
+  }
 
   if (cardInfo.password != null) {
     throw { type: "Bad_Request", message: "Password already registered!" };
@@ -66,21 +78,9 @@ export async function activateCard(
   }
 
   const encryptedPassword = bcrypt.hashSync(password, 10);
+  const cardData = { password: encryptedPassword }
 
-  const cardData = {
-    employeeId: cardInfo.employeeId,
-    number: cardInfo.number,
-    cardholderName: cardInfo.cardholderName,
-    securityCode: cardInfo.securityCode,
-    expirationDate: cardInfo.expirationDate,
-    password: encryptedPassword,
-    isVirtual: false,
-    originalCardId: null,
-    isBlocked: false,
-    type: cardInfo.type,
-  };
-
-  await cardRepository.update(cardInfo.id, cardData);
+  await cardRepository.update(id, cardData);
 }
 
 export async function getBalanceAndStats(cardId: number) {
@@ -114,10 +114,9 @@ export async function cardBlock(cardId: number, password: string) {
     throw { type: "Not_Found", message: "Card does not exist!" };
   }
 
-  // if (dayjs().isAfter(cardInfo.expirationDate)) {
-  //   console.log("AQUIIII666666")
-  //   throw { type: "Bad_Request", message: "Card expired!" };
-  // }
+  if (dayjs(cardInfo.expirationDate).isBefore(dayjs(Date.now()).format("MM-YY"))) {
+    throw { type: "Bad_Request", message: "Card expired!" };
+  }
 
   if (cardInfo.isBlocked == true) {
     throw { type: "Bad_Request", message: "The card is already blocked!" };
@@ -129,20 +128,7 @@ export async function cardBlock(cardId: number, password: string) {
     throw { type: "Bad_Request", message: "Wrong password!" };
   }
 
-  const cardData = {
-    employeeId: cardInfo.employeeId,
-    number: cardInfo.number,
-    cardholderName: cardInfo.cardholderName,
-    securityCode: cardInfo.securityCode,
-    expirationDate: cardInfo.expirationDate,
-    password: cardInfo.password,
-    isVirtual: false,
-    originalCardId: null,
-    isBlocked: true,
-    type: cardInfo.type,
-  };
-
-  await cardRepository.update(cardInfo.id, cardData);
+  await cardRepository.update(cardId, { isBlocked: true });
 }
 
 export async function cardDesblock(cardId: number, password: string) {
@@ -152,10 +138,9 @@ export async function cardDesblock(cardId: number, password: string) {
     throw { type: "Not_Found", message: "Card does not exist!" };
   }
 
-  // if (dayjs().isAfter(cardInfo.expirationDate)) {
-  //   console.log("AQUIIII666666")
-  //   throw { type: "Bad_Request", message: "Card expired!" };
-  // }
+  if (dayjs(cardInfo.expirationDate).isBefore(dayjs(Date.now()).format("MM-YY"))) {
+    throw { type: "Bad_Request", message: "Card expired!" };
+  }
 
   if (cardInfo.isBlocked == false) {
     throw { type: "Bad_Request", message: "The card is already blocked!" };
@@ -167,18 +152,5 @@ export async function cardDesblock(cardId: number, password: string) {
     throw { type: "Bad_Request", message: "Wrong password!" };
   }
 
-  const cardData = {
-    employeeId: cardInfo.employeeId,
-    number: cardInfo.number,
-    cardholderName: cardInfo.cardholderName,
-    securityCode: cardInfo.securityCode,
-    expirationDate: cardInfo.expirationDate,
-    password: cardInfo.password,
-    isVirtual: false,
-    originalCardId: null,
-    isBlocked: false,
-    type: cardInfo.type,
-  };
-
-  await cardRepository.update(cardInfo.id, cardData);
+  await cardRepository.update(cardId, { isBlocked: false });
 }

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { createCard, activateCard, getBalanceAndStats, cardBlock, cardDesblock } from "../controllers/cardController.js";
-import { employeeMiddleware } from "../middlewares/employeeMiddleware.js";
 import { authenticationApiKey } from "../middlewares/apiKeyMiddleware.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 import { createCardSchema } from "../schemas/createCardSchema.js";
@@ -13,8 +12,6 @@ const cardRouter = Router();
 cardRouter.post(
   "/createcard",
   authenticationApiKey,
-  employeeMiddleware.employeeExists,
-  employeeMiddleware.uniqueCardType,
   validateSchema(createCardSchema),
   createCard
 );

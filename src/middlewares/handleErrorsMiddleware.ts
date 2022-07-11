@@ -7,19 +7,19 @@ export default function handleErrorsMiddleware(
   next: NextFunction
 ) {
   if (error.type === "Bad_Request") {
-    res.sendStatus(400);
+    return res.status(400).send(error.message);
   }
   if (error.type === "Unauthorized") {
-    res.sendStatus(401);
+    return res.status(401).send(error.message);
   }
   if (error.type === "Not_Found") {
-    res.sendStatus(404);
+    return res.status(404).send(error.message);
   }
   if (error.type === "Conflict") {
-    res.sendStatus(409);
+    return res.status(409).send(error.message);
   }
   if (error.type === "Unprocessable_Entity") {
-    res.sendStatus(422);
+    return res.status(422).send(error.message);
   }
-  res.sendStatus(500)
+  return res.status(500).send("Internal Server Error")
 }

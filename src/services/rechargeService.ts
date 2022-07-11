@@ -28,6 +28,6 @@ export async function cardRecharge(cardId: number, amount: number) {
     throw { type: "Bad_Request", message: "Card expired!" };
   }
 
-  const rechargeObject = { cardId: cardId, amount: amount };
+  const rechargeObject = { cardId, amount };
   await rechargeRepository.insert(rechargeObject);
 }
