@@ -12,8 +12,8 @@ app.use(cors());
 app.use(json());
 app.use(router);
 app.use(handleErrorsMiddleware);
-const port = +process.env.PORT || 5000;
 
+const port = +process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(chalk.bold.green(`Server is running on port: ${port}`));
 });
