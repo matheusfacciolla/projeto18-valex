@@ -8,7 +8,6 @@ const paymentRouter = Router();
 
 paymentRouter.post(
   "/cardpayment",
-  authenticationApiKey,
   validateSchema(paymentSchema),
   cardPayment
 );

@@ -1,7 +1,7 @@
 import * as paymentRepository from "../repositories/paymentRepository.js";
 
 import ensureCardExist from "../utils/ensureValidations/ensureCardExist.js";
-import ensureCardIsActive from "../utils/ensureValidations/ensureCardIsActive.js";
+import { ensureCardIsActive } from "../utils/ensureValidations/ensureCard.js";
 import ensureDateIsNotExpiration from "../utils/ensureValidations/ensureDateIsNotExpiration.js";
 import ensureCardIsNotBlocked from "../utils/ensureValidations/ensureCardIsNotBlocked.js";
 import ensureIsCorrectPassword from "../utils/ensureValidations/ensureIsCorrectPassword.js";
@@ -24,10 +24,10 @@ export async function cardPayment(
   await ensureCardIsNotBlocked(cardInfo);
   await ensureIsCorrectPassword(cardInfo, password);
   const businessInfos = await ensureBusinessIsRegistered(businessId);
-  await ensureCardAndBusinessType(cardInfo, businessInfos)
-  
+  await ensureCardAndBusinessType(cardInfo, businessInfos);
+
   const res = await calculateBalance(cardId);
-  await ensureBalanceBiggerThanAmount(res.balance, amount)
+  await ensureBalanceBiggerThanAmount(res.balance, amount);
 
   const paymentObject = { cardId, businessId, amount };
   await paymentRepository.insert(paymentObject);

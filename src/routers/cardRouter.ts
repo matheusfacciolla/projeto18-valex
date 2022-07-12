@@ -4,7 +4,6 @@ import { authenticationApiKey } from "../middlewares/apiKeyMiddleware.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 import { createCardSchema } from "../schemas/createCardSchema.js";
 import { activateCardSchema } from "../schemas/activateCardSchema.js";
-import { balanceCardSchema } from "../schemas/balanceCardSchema.js";
 import { blockAndDesblockCardSchema } from "../schemas/blockAndDesblockCardSchema.js";
 
 const cardRouter = Router();
@@ -18,28 +17,23 @@ cardRouter.post(
 
 cardRouter.put(
   "/activatecard",
-  authenticationApiKey,
   validateSchema(activateCardSchema),
   activateCard
 );
 
 cardRouter.get(
-  "/cardbalance",
-  authenticationApiKey,
-  validateSchema(balanceCardSchema),
+  "/cardbalance/:cardId",
   getBalanceAndStats
 );
 
 cardRouter.put(
   "/blockcard",
-  authenticationApiKey,
   validateSchema(blockAndDesblockCardSchema),
   cardBlock
 );
 
 cardRouter.put(
   "/desblockcard",
-  authenticationApiKey,
   validateSchema(blockAndDesblockCardSchema),
   cardDesblock
 );
