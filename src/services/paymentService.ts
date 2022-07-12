@@ -1,9 +1,9 @@
 import * as paymentRepository from "../repositories/paymentRepository.js";
 
 import ensureCardExist from "../utils/ensureValidations/ensureCardExist.js";
-import { ensureCardIsActive } from "../utils/ensureValidations/ensureCard.js";
+import { ensureCardIsActive } from "../utils/ensureValidations/ensureCardActive.js";
 import ensureDateIsNotExpiration from "../utils/ensureValidations/ensureDateIsNotExpiration.js";
-import ensureCardIsNotBlocked from "../utils/ensureValidations/ensureCardIsNotBlocked.js";
+import { ensureCardIsNotBlocked } from "../utils/ensureValidations/ensureCardBlock.js";
 import ensureIsCorrectPassword from "../utils/ensureValidations/ensureIsCorrectPassword.js";
 import ensureBusinessIsRegistered from "../utils/ensureValidations/ensureBusinessIsRegistered.js";
 import ensureCardAndBusinessType from "../utils/ensureValidations/ensureCardAndBusinessType.js";

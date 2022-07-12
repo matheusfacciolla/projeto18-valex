@@ -9,11 +9,10 @@ import ensureEmployeeExist from "../utils/ensureValidations/ensureEmployeeExist.
 import ensureDifferentCard from "../utils/ensureValidations/ensureDifferentCard.js";
 import ensureCardExist from "../utils/ensureValidations/ensureCardExist.js";
 import ensureDateIsNotExpiration from "../utils/ensureValidations/ensureDateIsNotExpiration.js";
-import { ensureCardIsNotActive } from "../utils/ensureValidations/ensureCard.js";
+import { ensureCardIsNotActive } from "../utils/ensureValidations/ensureCardActive.js";
 import ensureIsCorrectCVV from "../utils/ensureValidations/ensureIsCorrectCVV.js";
-import ensureCardIsNotBlocked from "../utils/ensureValidations/ensureCardIsNotBlocked.js";
 import ensureIsCorrectPassword from "../utils/ensureValidations/ensureIsCorrectPassword.js";
-import ensureCardIsBlocked from "../utils/ensureValidations/ensureCardIsBlocked.js";
+import {ensureCardIsBlocked, ensureCardIsNotBlocked} from "../utils/ensureValidations/ensureCardBlock.js";
 import calculateBalance from "../utils/calculateBalance.js";
 
 export async function createCard(
@@ -43,7 +42,8 @@ export async function createCard(
     type: cardType,
   };
 
-  await cardRepository.insert(cardData);
+  const newCard = await cardRepository.insert(cardData);
+  return newCard;
 }
 
 export async function activateCard(
@@ -63,6 +63,7 @@ export async function activateCard(
   const cardData = encryptedPassword(password);
 
   await cardRepository.update(cardId, cardData);
+  return;
 }
 
 export async function getBalanceAndStats(cardIdNumber: number) {
@@ -85,6 +86,7 @@ export async function cardBlock(cardId: number, password: string) {
   await ensureIsCorrectPassword(cardInfo, password);
 
   await cardRepository.update(cardId, { isBlocked: true });
+  return;
 }
 
 export async function cardDesblock(cardId: number, password: string) {
@@ -94,4 +96,5 @@ export async function cardDesblock(cardId: number, password: string) {
   await ensureIsCorrectPassword(cardInfo, password);
 
   await cardRepository.update(cardId, { isBlocked: false });
+  return;
 }

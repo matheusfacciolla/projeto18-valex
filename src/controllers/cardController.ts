@@ -6,9 +6,8 @@ import * as cardService from "../services/cardService.js";
 export async function createCard(req: Request, res: Response) {
   const { employeeId, cardType }: { employeeId: number, cardType: cardRepository.TransactionTypes } = req.body;
 
-  await cardService.createCard(employeeId, cardType);
-  const cardCreated = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
-  return res.status(201).send(cardCreated);
+  const createNewCard = await cardService.createCard(employeeId, cardType);
+  return res.status(201).send(createNewCard);
 }
 
 export async function activateCard(req: Request, res: Response) {
